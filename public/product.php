@@ -27,6 +27,38 @@ session_start();
     // initialize the messages 
     $message = null;
 
+    // add to cart handle
+    if(isset($_POST['add_to_cart'])){
+        // making sure that the user is registered 
+        if(!isset($_SESSION['user_id'])){
+            header("Location: login.php");
+            exit;
+        }
+
+        $user_id = $_SESSION['user_id'];
+
+        // use a transaction to ensure integrity
+        try {
+            $pdo->beginTransaction();
+
+            $stmt = $pdo->prepare("
+            INSERT INTO cart (user_id, product_id, quantity) VALUES (?,?,? ) ON DUPLICATE KEY UPDATE quantity = quantity + 1
+            ");
+
+            $stmt->execute([$user_id, $product_id]);
+            $pdo->commit();
+
+            $message = "Product Added to cart";
+
+
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            $message = "Failed to add to cart, Please try again";
+        }
+
+
+    }
+
 
 
 
@@ -57,7 +89,7 @@ include 'partials/header.php';
         <div class="alert alert-info"> <?= htmlspecialchars($message) ?></div>
      <?php endif; ?>
 
-    <form>
+    <form method="POST" class="mb-3">
          <!-- add cart -->
          <button type="submit" name="add_to_cart" class="btn btn-primary"> <i class="bi bi-cart"></i> Add to Cart </button>
          <!-- add cart ends -->

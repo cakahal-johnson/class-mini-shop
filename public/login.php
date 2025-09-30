@@ -8,7 +8,7 @@
 $errors = [];
 
 // Handle login submission
-if ($_SERVER[REQUEST_METHOD] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email']);
     $pass = $_POST['password'];
 
